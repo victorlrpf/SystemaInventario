@@ -1,40 +1,43 @@
-﻿using SystemaInventario.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using SystemaInventario.Models;
 
-namespace SystemaInventario.Services
+namespace SistemaInventario.Services
 {
     public class InventoryService
     {
-        // Lista que vai armazenar os produtos em memória
-        private readonly List<Product> _inventory;
+        private readonly JsonDatabaseService _db;
 
         public InventoryService()
         {
-            _inventory = new List<Product>();
+            _db = new JsonDatabaseService();
         }
 
-        public List<Product> GetAllProducts()
-        {
-            return _inventory;
-        }
+        public List<Product> GetAllProducts() => _db.LoadProducts();
 
-        public Product GetProductById(int id)
-        {
-            return _inventory.FirstOrDefault(p => p.Id == id);
-        }
+        public Product GetProductById(int id) =>
+            _db.LoadProducts().FirstOrDefault(p => p.Id == id);
 
         public void AddProduct(Product product)
         {
-            _inventory.Add(product);
+            var products = _db.LoadProducts();
+
+            // 🔹 Gerando ID automaticamente
+            int newId = products.Any() ? products.Max(p => p.Id) + 1 : 1;
+            product.Id = newId;
+
+            products.Add(product);
+            _db.SaveProducts(products); // Salva no JSON
         }
 
         public bool RemoveProduct(int id)
         {
-            var product = GetProductById(id);
+            var products = _db.LoadProducts();
+            var product = products.FirstOrDefault(p => p.Id == id);
             if (product != null)
             {
-                _inventory.Remove(product);
+                products.Remove(product);
+                _db.SaveProducts(products);
                 return true;
             }
             return false;
@@ -42,10 +45,12 @@ namespace SystemaInventario.Services
 
         public bool UpdateProductQuantity(int id, int newQuantity)
         {
-            var product = GetProductById(id);
+            var products = _db.LoadProducts();
+            var product = products.FirstOrDefault(p => p.Id == id);
             if (product != null)
             {
                 product.Quantity = newQuantity;
+                _db.SaveProducts(products);
                 return true;
             }
             return false;
@@ -53,20 +58,26 @@ namespace SystemaInventario.Services
 
         public List<Product> GetProductsByCategory(string category)
         {
-            return _inventory.Where(p => p.Category.ToLower() == category.ToLower()).ToList();
+            return _db.LoadProducts()
+                .Where(p => p.Category.ToLower() == category.ToLower())
+                .ToList();
         }
 
         public List<Product> GetProductsByPriceRange(decimal minPrice, decimal maxPrice)
         {
-            return _inventory.Where(p => p.Price >= minPrice && p.Price <= maxPrice).ToList();
+            return _db.LoadProducts()
+                .Where(p => p.Price >= minPrice && p.Price <= maxPrice)
+                .ToList();
         }
 
         public bool UpdateProductPrice(int id, decimal newPrice)
         {
-            var product = GetProductById(id);
+            var products = _db.LoadProducts();
+            var product = products.FirstOrDefault(p => p.Id == id);
             if (product != null)
             {
                 product.Price = newPrice;
+                _db.SaveProducts(products);
                 return true;
             }
             return false;
@@ -74,13 +85,12 @@ namespace SystemaInventario.Services
 
         public int GetTotalItemsInStock()
         {
-            return _inventory.Sum(p => p.Quantity);
+            return _db.LoadProducts().Sum(p => p.Quantity);
         }
 
         public decimal GetTotalInventoryValue()
         {
-            return _inventory.Sum(p => p.Price * p.Quantity);
+            return _db.LoadProducts().Sum(p => p.Price * p.Quantity);
         }
-
     }
 }

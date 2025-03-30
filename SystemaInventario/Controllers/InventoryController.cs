@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using SistemaInventario.Services;
 using SystemaInventario.Models;
-using SystemaInventario.Services;
 
-namespace SystemaInventario.Controllers
+namespace SistemaInventario.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -11,9 +10,10 @@ namespace SystemaInventario.Controllers
     {
         private readonly InventoryService _inventoryService;
 
-        public InventoryController()
+        // Injeção de dependência do serviço
+        public InventoryController(InventoryService inventoryService)
         {
-            _inventoryService = new InventoryService();
+            _inventoryService = inventoryService;
         }
 
         // GET: api/inventory
@@ -30,7 +30,7 @@ namespace SystemaInventario.Controllers
         {
             var product = _inventoryService.GetProductById(id);
             if (product == null)
-                return NotFound();
+                return NotFound(new { Message = "Produto não encontrado." });
             return Ok(product);
         }
 
@@ -38,16 +38,23 @@ namespace SystemaInventario.Controllers
         [HttpPost]
         public IActionResult AddProduct([FromBody] Product product)
         {
+            if (product == null)
+                return BadRequest(new { Message = "Dados inválidos." });
+
             _inventoryService.AddProduct(product);
             return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
         }
 
         // PUT: api/inventory/{id}
         [HttpPut("{id}")]
-        public IActionResult UpdateProductQuantity(int id, [FromBody] int newQuantity)
+        public IActionResult UpdateProductQuantity(int id, [FromBody] int? newQuantity)
         {
-            if (!_inventoryService.UpdateProductQuantity(id, newQuantity))
-                return NotFound();
+            if (!newQuantity.HasValue || newQuantity < 0)
+                return BadRequest(new { Message = "Quantidade inválida." });
+
+            if (!_inventoryService.UpdateProductQuantity(id, newQuantity.Value))
+                return NotFound(new { Message = "Produto não encontrado." });
+
             return NoContent();
         }
 
@@ -56,10 +63,12 @@ namespace SystemaInventario.Controllers
         public IActionResult RemoveProduct(int id)
         {
             if (!_inventoryService.RemoveProduct(id))
-                return NotFound();
+                return NotFound(new { Message = "Produto não encontrado." });
+
             return NoContent();
         }
 
+        // GET: api/inventory/category/{category}
         [HttpGet("category/{category}")]
         public IActionResult GetProductsByCategory(string category)
         {
@@ -67,6 +76,7 @@ namespace SystemaInventario.Controllers
             return Ok(products);
         }
 
+        // GET: api/inventory/price-range?minPrice=10&maxPrice=100
         [HttpGet("price-range")]
         public IActionResult GetProductsByPriceRange([FromQuery] decimal minPrice, [FromQuery] decimal maxPrice)
         {
@@ -74,14 +84,20 @@ namespace SystemaInventario.Controllers
             return Ok(products);
         }
 
+        // PUT: api/inventory/price/{id}
         [HttpPut("price/{id}")]
-        public IActionResult UpdateProductPrice(int id, [FromBody] decimal newPrice)
+        public IActionResult UpdateProductPrice(int id, [FromBody] decimal? newPrice)
         {
-            if (!_inventoryService.UpdateProductPrice(id, newPrice))
-                return NotFound();
+            if (!newPrice.HasValue || newPrice <= 0)
+                return BadRequest(new { Message = "Preço inválido." });
+
+            if (!_inventoryService.UpdateProductPrice(id, newPrice.Value))
+                return NotFound(new { Message = "Produto não encontrado." });
+
             return NoContent();
         }
 
+        // GET: api/inventory/total-items
         [HttpGet("total-items")]
         public IActionResult GetTotalItemsInStock()
         {
@@ -89,6 +105,7 @@ namespace SystemaInventario.Controllers
             return Ok(new { TotalItems = totalItems });
         }
 
+        // GET: api/inventory/total-value
         [HttpGet("total-value")]
         public IActionResult GetTotalInventoryValue()
         {

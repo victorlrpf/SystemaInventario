@@ -1,0 +1,25 @@
+{
+  "products": [
+    {
+      "Id": 1,
+      "Name": "Teclado",
+      "Quantity": 4,
+      "Price": 22.5,
+      "Category": "Perifericos"
+    },
+    {
+      "Id": 2,
+      "Name": "Mouse",
+      "Quantity": 3,
+      "Price": 30.3,
+      "Category": "Perifericos"
+    },
+    {
+      "Id": 3,
+      "Name": "Teste",
+      "Quantity": 0,
+      "Price": 0,
+      "Category": "string"
+    }
+  ]
+}
