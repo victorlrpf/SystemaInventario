@@ -1,169 +1,108 @@
-# Sistema de Inventário - API
+# 📦 API de Inventário
 
-Este é um projeto de **API RESTful** para o gerenciamento de um sistema de inventário. A API permite que os usuários adicionem, removam e atualizem produtos no inventário, bem como realizem consultas e relatórios sobre os itens disponíveis.
+## 📌 Visão Geral
+Esta é uma API para gestão de inventário, desenvolvida em **C# com ASP.NET Core**.
+A API permite adicionar, listar, atualizar e remover produtos, simulando um banco de dados através de arquivos JSON.
 
-## Funcionalidades
+## 🚀 Tecnologias Utilizadas
+- **C#**
+- **ASP.NET Core 7**
+- **JSON como banco de dados simulado**
+- **Swagger para documentação da API**
 
-- **Gerenciamento de Produtos**: Adicionar, remover e atualizar produtos no inventário.
-- **Filtros de Busca**: Filtrar produtos por categoria ou faixa de preço.
-- **Atualização de Preço**: Alterar o preço de um produto.
-- **Relatórios**: Obter o total de itens em estoque e o valor total do inventário.
-
-## Tecnologias Utilizadas
-
-- **C#**: Linguagem de programação principal.
-- **ASP.NET Core**: Framework para construção de APIs.
-- **In-Memory Data Storage**: Armazenamento de dados em memória (sem banco de dados).
-- **Swagger**: Interface para testar as APIs diretamente no navegador.
-
-## Endpoints
-
-### 1. **GET /api/inventory**
-Retorna todos os produtos no inventário.
-
-**Exemplo de resposta**:
-
-```json
-[
-    {
-        "id": 1,
-        "name": "Produto A",
-        "quantity": 100,
-        "price": 10.99,
-        "category": "Categoria 1"
-    },
-    {
-        "id": 2,
-        "name": "Produto B",
-        "quantity": 50,
-        "price": 5.49,
-        "category": "Categoria 2"
-    }
-]
+## 📂 Estrutura do Projeto
+```
+SistemaInventario/
+│── Controllers/
+│   ├── InventoryController.cs
+│── Models/
+│   ├── Product.cs
+│── Services/
+│   ├── InventoryService.cs
+│   ├── JsonDatabaseService.cs
+│── Program.cs
+│── database.json  # Simula o banco de dados
+│── README.md
 ```
 
-### 2. **GET /api/inventory/{id}**
-Retorna um produto específico pelo **id**.
+## 🛠 Configuração e Execução
+### 1️⃣ Clonar o repositório
+```bash
+git clone https://github.com/victorlrpf/sistemaInventario.git
+cd sistemaInventario
+```
 
-**Exemplo de resposta**:
+### 2️⃣ Instalar dependências
+```bash
+dotnet restore
+```
 
+### 3️⃣ Executar a API
+```bash
+dotnet run
+```
+A API estará disponível em `https://localhost:7280`.
+
+### 4️⃣ Acessar a documentação
+Abra o navegador e acesse:
+```
+https://localhost:7280/swagger/index.html
+```
+
+## 🔥 Endpoints da API
+
+### 📌 **Listar todos os produtos**
+**GET** `/api/inventory`
 ```json
-{
+[
+  {
     "id": 1,
-    "name": "Produto A",
-    "quantity": 100,
-    "price": 10.99,
-    "category": "Categoria 1"
-}
-```
-
-### 3. **POST /api/inventory**
-Adiciona um novo produto ao inventário.
-
-**Exemplo de corpo de requisição**:
-
-```json
-{
-    "id": 3,
-    "name": "Produto C",
-    "quantity": 200,
-    "price": 15.99,
-    "category": "Categoria 3"
-}
-```
-
-### 3. **POST /api/inventory**
-Adiciona um novo produto ao inventário.
-
-**Exemplo de corpo de requisição**:
-
-```json
-{
-    "id": 3,
-    "name": "Produto C",
-    "quantity": 200,
-    "price": 15.99,
-    "category": "Categoria 3"
-}
-```
-
-### 4. **PUT /api/inventory/{id}**
-Atualiza a quantidade de um produto.
-
-**Exemplo de corpo de requisição**:
-
-```json
-{
-    "newQuantity": 150
-}
-```
-
-### 5. **PUT /api/inventory/price/{id}**
-Atualiza o preço de um produto.
-
-**Exemplo de corpo de requisição**:
-
-```json
-{
-    "newPrice": 12.99
-}
-```
-
-### 6. **DELETE /api/inventory/{id}**
-Remove um produto do inventário pelo id.
-
-### 7. **GET /api/inventory/category/{category}**
-Filtra produtos por categoria.
-
-**Exemplo de resposta**:
-
-```json
-[
-    {
-        "id": 1,
-        "name": "Produto A",
-        "quantity": 100,
-        "price": 10.99,
-        "category": "Categoria 1"
-    }
+    "name": "Teclado Mecânico",
+    "quantity": 10,
+    "price": 199.99,
+    "category": "Periféricos"
+  }
 ]
 ```
 
-### 8. **GET /api/inventory/price-range?minPrice=10&maxPrice=100**
-Filtra produtos por faixa de preço.
+### 📌 **Buscar um produto por ID**
+**GET** `/api/inventory/{id}`
 
-**Exemplo de resposta**:
-
-```json
-[
-    {
-        "id": 1,
-        "name": "Produto A",
-        "quantity": 100,
-        "price": 10.99,
-        "category": "Categoria 1"
-    }
-]
-```
-
-### 9. **GET /api/inventory/total-items**
-Retorna o total de itens em estoque.
-
-**Exemplo de resposta**:
-
+### 📌 **Adicionar um novo produto**
+**POST** `/api/inventory`
 ```json
 {
-    "TotalItems": 350
+  "name": "Mouse Gamer",
+  "quantity": 5,
+  "price": 129.99,
+  "category": "Periféricos"
 }
 ```
 
-### 10. **GET /api/inventory/total-value**
-Retorna o valor total do inventário.
-
-**Exemplo de resposta**:
-
+### 📌 **Atualizar a quantidade de um produto**
+**PUT** `/api/inventory/{id}`
 ```json
 {
-    "TotalValue": 1234.50
+  "newQuantity": 15
 }
 ```
+
+### 📌 **Remover um produto**
+**DELETE** `/api/inventory/{id}`
+
+### 📌 **Buscar produtos por categoria**
+**GET** `/api/inventory/category/{category}`
+
+### 📌 **Buscar produtos dentro de uma faixa de preço**
+**GET** `/api/inventory/price-range?minPrice=100&maxPrice=500`
+
+### 📌 **Obter o total de itens em estoque**
+**GET** `/api/inventory/total-items`
+
+### 📌 **Obter o valor total do inventário**
+**GET** `/api/inventory/total-value`
+
+## 📜 Licença
+Este projeto está sob a MIT License. Sinta-se livre para usá-lo e modificá-lo!
+
+---
