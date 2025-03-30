@@ -101,8 +101,3 @@ https://localhost:7280/swagger/index.html
 
 ### 📌 **Obter o valor total do inventário**
 **GET** `/api/inventory/total-value`
-
-## 📜 Licença
-Este projeto está sob a MIT License. Sinta-se livre para usá-lo e modificá-lo!
-
----
