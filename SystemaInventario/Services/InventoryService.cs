@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using SystemaInventario.Models;
+using SistemaInventario.Models;
 
 namespace SistemaInventario.Services
 {
     public class InventoryService
     {
-        private readonly JsonDatabaseService _db;
+        private readonly MySqlDatabaseService _db;
 
-        public InventoryService()
+        public InventoryService(MySqlDatabaseService db)
         {
-            _db = new JsonDatabaseService();
+            _db = db;
         }
 
         public List<Product> GetAllProducts() => _db.LoadProducts();
@@ -20,24 +20,15 @@ namespace SistemaInventario.Services
 
         public void AddProduct(Product product)
         {
-            var products = _db.LoadProducts();
-
-            // 🔹 Gerando ID automaticamente
-            int newId = products.Any() ? products.Max(p => p.Id) + 1 : 1;
-            product.Id = newId;
-
-            products.Add(product);
-            _db.SaveProducts(products); // Salva no JSON
+            _db.SaveProduct(product);
         }
 
         public bool RemoveProduct(int id)
         {
-            var products = _db.LoadProducts();
-            var product = products.FirstOrDefault(p => p.Id == id);
-            if (product != null)
+            var existing = GetProductById(id);
+            if (existing != null)
             {
-                products.Remove(product);
-                _db.SaveProducts(products);
+                _db.DeleteProduct(id);
                 return true;
             }
             return false;
@@ -45,12 +36,23 @@ namespace SistemaInventario.Services
 
         public bool UpdateProductQuantity(int id, int newQuantity)
         {
-            var products = _db.LoadProducts();
-            var product = products.FirstOrDefault(p => p.Id == id);
+            var product = GetProductById(id);
             if (product != null)
             {
                 product.Quantity = newQuantity;
-                _db.SaveProducts(products);
+                _db.UpdateProduct(product);
+                return true;
+            }
+            return false;
+        }
+
+        public bool UpdateProductPrice(int id, decimal newPrice)
+        {
+            var product = GetProductById(id);
+            if (product != null)
+            {
+                product.Price = newPrice;
+                _db.UpdateProduct(product);
                 return true;
             }
             return false;
@@ -68,19 +70,6 @@ namespace SistemaInventario.Services
             return _db.LoadProducts()
                 .Where(p => p.Price >= minPrice && p.Price <= maxPrice)
                 .ToList();
-        }
-
-        public bool UpdateProductPrice(int id, decimal newPrice)
-        {
-            var products = _db.LoadProducts();
-            var product = products.FirstOrDefault(p => p.Id == id);
-            if (product != null)
-            {
-                product.Price = newPrice;
-                _db.SaveProducts(products);
-                return true;
-            }
-            return false;
         }
 
         public int GetTotalItemsInStock()

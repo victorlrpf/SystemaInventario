@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SistemaInventario.Services;
-using SystemaInventario.Models;
+using SistemaInventario.Models;
 
 namespace SistemaInventario.Controllers
 {
@@ -31,6 +31,7 @@ namespace SistemaInventario.Controllers
             var product = _inventoryService.GetProductById(id);
             if (product == null)
                 return NotFound(new { Message = "Produto não encontrado." });
+
             return Ok(product);
         }
 
@@ -52,7 +53,8 @@ namespace SistemaInventario.Controllers
             if (!newQuantity.HasValue || newQuantity < 0)
                 return BadRequest(new { Message = "Quantidade inválida." });
 
-            if (!_inventoryService.UpdateProductQuantity(id, newQuantity.Value))
+            var updated = _inventoryService.UpdateProductQuantity(id, newQuantity.Value);
+            if (!updated)
                 return NotFound(new { Message = "Produto não encontrado." });
 
             return NoContent();
@@ -62,7 +64,8 @@ namespace SistemaInventario.Controllers
         [HttpDelete("{id}")]
         public IActionResult RemoveProduct(int id)
         {
-            if (!_inventoryService.RemoveProduct(id))
+            var removed = _inventoryService.RemoveProduct(id);
+            if (!removed)
                 return NotFound(new { Message = "Produto não encontrado." });
 
             return NoContent();
@@ -91,7 +94,8 @@ namespace SistemaInventario.Controllers
             if (!newPrice.HasValue || newPrice <= 0)
                 return BadRequest(new { Message = "Preço inválido." });
 
-            if (!_inventoryService.UpdateProductPrice(id, newPrice.Value))
+            var updated = _inventoryService.UpdateProductPrice(id, newPrice.Value);
+            if (!updated)
                 return NotFound(new { Message = "Produto não encontrado." });
 
             return NoContent();

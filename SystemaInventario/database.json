@@ -20,6 +20,20 @@
       "Quantity": 0,
       "Price": 0,
       "Category": "string"
+    },
+    {
+      "Id": 4,
+      "Name": "Bolsa",
+      "Quantity": 3,
+      "Price": 30,
+      "Category": "Moda"
+    },
+    {
+      "Id": 5,
+      "Name": "Bolsa",
+      "Quantity": 3,
+      "Price": 30,
+      "Category": "Moda"
     }
   ]
 }

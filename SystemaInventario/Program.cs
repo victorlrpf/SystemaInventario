@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // ?? Registrar InventoryService e JsonDatabaseService para injeção de dependência
-builder.Services.AddSingleton<JsonDatabaseService>();
+builder.Services.AddSingleton<MySqlDatabaseService>();
 builder.Services.AddSingleton<InventoryService>();
 
 builder.Services.AddEndpointsApiExplorer();
